@@ -1,0 +1,12 @@
+﻿header {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    align-items: center;
+    height: 3rem;
+    background-color: #eeeeee;
+}
+
+    header .login {
+        padding-right: 1rem;
+    }

@@ -1,0 +1,14 @@
+﻿@using OAuthExample.Web.Models
+@model UserInfoViewModel
+
+@if (Model.IsAuthenticated)
+{
+    <div class="user-info">
+        <span>Welcome @Model.UserName</span>
+        <a asp-controller="Login" asp-action="Logout">Logout</a>
+    </div>
+}
+else
+{
+    <a asp-controller="Login">Login</a>
+}
