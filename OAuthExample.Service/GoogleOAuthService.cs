@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OAuthExample.Service.Enums;
+using OAuthExample.Service.Models;
 using OAuthExample.Service.Options;
 using System.Net.Http.Headers;
-using System.Security.Claims;
 
 namespace OAuthExample.Service
 {
@@ -28,16 +28,17 @@ namespace OAuthExample.Service
             return $"{_options.EndPoint.Authorize}?scope=email profile&include_granted_scopes=true&response_type=code&state=xxxxxxxxxxxxxxxx&redirect_uri={_options.CallbackUrl}&client_id={_options.ClientId}";
         }
 
-        public async Task<List<Claim>> Login(string code)
+        public async Task<LoginDataDto> Login(string code)
         {
             string tokenJsonStr = await GetToken(code);
             TokenDto tokenDto = JsonConvert.DeserializeObject<TokenDto>(tokenJsonStr) ?? new();
             string userInfoJson = await GetUserInfo(tokenDto.access_token);
             UserInfoDto userInfoDto = JsonConvert.DeserializeObject<UserInfoDto>(userInfoJson) ?? new();
-            return new List<Claim>
+            return new LoginDataDto
             {
-                new(ClaimTypes.AuthenticationMethod, AuthenticationMethod.ToString()),
-                new(ClaimTypes.Name, userInfoDto.name)
+                Id = userInfoDto.id,
+                Name = userInfoDto.name,
+                AuthenticationMethod = AuthenticationMethod
             };
         }
 

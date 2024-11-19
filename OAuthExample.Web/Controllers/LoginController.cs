@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using OAuthExample.Service;
+using OAuthExample.Service.Models;
 using System.Security.Claims;
 
 namespace OAuthExample.Web.Controllers
@@ -46,8 +47,8 @@ namespace OAuthExample.Web.Controllers
                 var service = _loginServices.FirstOrDefault(x => x.AuthenticationMethod.ToString() == authenticationMethod);
                 if (service == null)
                     return BadRequest("undefined authenticationMethod");
-                List<Claim> claims = await service.Login(code);
-                await SetLoginCookie(claims);
+                var loginData = await service.Login(code);
+                await SetLoginCookie(loginData);
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
@@ -64,8 +65,13 @@ namespace OAuthExample.Web.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        private async Task SetLoginCookie(IEnumerable<Claim> claims)
+        private async Task SetLoginCookie(LoginDataDto loginData)
         {
+            var claims = new List<Claim>()
+            {
+                new(ClaimTypes.AuthenticationMethod, loginData.AuthenticationMethod.ToString()),
+                new(ClaimTypes.Name, loginData.Name)
+            };
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "LoginAuth");
             ClaimsPrincipal principal = new ClaimsPrincipal(claimsIdentity);
             await HttpContext.SignInAsync("LoginAuth", principal, new AuthenticationProperties());
