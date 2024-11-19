@@ -1,5 +1,5 @@
-﻿using System.Security.Claims;
-using OAuthExample.Service.Enums;
+﻿using OAuthExample.Service.Enums;
+using OAuthExample.Service.Models;
 
 namespace OAuthExample.Service
 {
@@ -12,6 +12,6 @@ namespace OAuthExample.Service
         string GetLoginPageUrl();
 
         /// <summary> 登入 </summary>
-        Task<List<Claim>> Login(string code);
+        Task<LoginDataDto> Login(string code);
     }
 }
