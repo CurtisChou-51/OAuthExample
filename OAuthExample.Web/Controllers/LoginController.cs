@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using OAuthExample.Service;
-using OAuthExample.Service.Models;
+using OAuthExample.Web.Models;
+using OAuthExample.Web.Services;
 using System.Security.Claims;
 
 namespace OAuthExample.Web.Controllers
@@ -9,12 +9,12 @@ namespace OAuthExample.Web.Controllers
     public class LoginController : Controller
     {
         private readonly ILogger _logger;
-        private readonly IEnumerable<IOAuthService> _loginServices;
+        private readonly ILoginService _loginService;
 
-        public LoginController(ILogger<LoginController> logger, IEnumerable<IOAuthService> loginServices)
+        public LoginController(ILogger<LoginController> logger, ILoginService loginService)
         {
             _logger = logger;
-            _loginServices = loginServices;
+            _loginService = loginService;
         }
 
         [HttpGet]
@@ -28,11 +28,10 @@ namespace OAuthExample.Web.Controllers
         [Route("{controller}/{action}/{authenticationMethod}")]
         public IActionResult LoginPage(string authenticationMethod)
         {
-            var service = _loginServices.FirstOrDefault(x => x.AuthenticationMethod.ToString() == authenticationMethod);
-            if (service == null)
-                return BadRequest("undefined authenticationMethod");
-            string url = service.GetLoginPageUrl();
-            return Redirect(url);
+            OAuthLoginUrlDto result = _loginService.GetOAuthLoginUrl(authenticationMethod);
+            if (!result.Success)
+                return BadRequest(result.Error);
+            return Redirect(result.Url);
         }
 
         /// <summary> OAuth CallBack </summary>
@@ -40,22 +39,11 @@ namespace OAuthExample.Web.Controllers
         [Route("{controller}/{action}/{authenticationMethod}")]
         public async Task<IActionResult> CallBack(string authenticationMethod, string code, string state)
         {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(code))
-                    return BadRequest("code is required");
-                var service = _loginServices.FirstOrDefault(x => x.AuthenticationMethod.ToString() == authenticationMethod);
-                if (service == null)
-                    return BadRequest("undefined authenticationMethod");
-                var loginData = await service.Login(code);
-                await SetLoginCookie(loginData);
-                return RedirectToAction("Index", "Home");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error processing callback");
-                return BadRequest("Error processing callback");
-            }
+            LoginResultDto loginResult = await _loginService.OAuthLogin(authenticationMethod, code, state);
+            if (loginResult.UserInfo == null)
+                return BadRequest(loginResult.Error);
+            await SetLoginCookie(loginResult.UserInfo);
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
@@ -65,12 +53,12 @@ namespace OAuthExample.Web.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        private async Task SetLoginCookie(LoginDataDto loginData)
+        private async Task SetLoginCookie(LoginUserInfoDto userInfo)
         {
             var claims = new List<Claim>()
             {
-                new(ClaimTypes.AuthenticationMethod, loginData.AuthenticationMethod.ToString()),
-                new(ClaimTypes.Name, loginData.Name)
+                new(ClaimTypes.AuthenticationMethod, userInfo.AuthenticationMethod),
+                new(ClaimTypes.Name, userInfo.UserName)
             };
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "LoginAuth");
             ClaimsPrincipal principal = new ClaimsPrincipal(claimsIdentity);
