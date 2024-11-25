@@ -1,5 +1,6 @@
 using OAuthExample.Service;
 using OAuthExample.Service.Options;
+using OAuthExample.Web.Repositories;
 using OAuthExample.Web.Services;
 
 namespace OAuthExample.Web
@@ -17,6 +18,7 @@ namespace OAuthExample.Web
             builder.Services.AddScoped<IOAuthService, GoogleOAuthService>();
             builder.Services.AddScoped<IOAuthService, LineOAuthService>();
             builder.Services.AddScoped<ILoginService, LoginService>();
+            builder.Services.AddScoped<ILoginRepository, LoginRepository>();
             builder.Services.Configure<GoogleLoginOptions>(configuration.GetSection("GoogleLogin"));
             builder.Services.Configure<LineLoginOptions>(configuration.GetSection("LineLogin"));
 
