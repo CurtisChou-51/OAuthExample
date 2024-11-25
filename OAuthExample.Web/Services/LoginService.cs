@@ -1,5 +1,7 @@
 ﻿using OAuthExample.Service;
+using OAuthExample.Service.Models;
 using OAuthExample.Web.Models;
+using OAuthExample.Web.Repositories;
 
 namespace OAuthExample.Web.Services
 {
@@ -7,11 +9,13 @@ namespace OAuthExample.Web.Services
     {
         private readonly ILogger _logger;
         private readonly IEnumerable<IOAuthService> _oAuthServices;
+        private readonly ILoginRepository _loginRepository;
 
-        public LoginService(ILogger<LoginService> logger, IEnumerable<IOAuthService> oAuthService)
+        public LoginService(ILogger<LoginService> logger, IEnumerable<IOAuthService> oAuthService, ILoginRepository loginRepository)
         {
             _logger = logger;
             _oAuthServices = oAuthService;
+            _loginRepository = loginRepository;
         }
 
         /// <summary> 取得 OAuth 登入 Url </summary>
@@ -35,15 +39,8 @@ namespace OAuthExample.Web.Services
                 if (oAuthService == null)
                     return new LoginResultDto { Error = "undefined authenticationMethod" };
 
-                var loginData = await oAuthService.Login(code);
-
-                // 在這裡可以將 OAuth 資料轉為系統內使用者資料
-                LoginUserInfoDto userInfo = new LoginUserInfoDto
-                {
-                    UserId = 1,
-                    UserName = loginData.Name,
-                    AuthenticationMethod = loginData.AuthenticationMethod.ToString()
-                };
+                LoginDataDto loginData = await oAuthService.Login(code);
+                LoginUserInfoDto userInfo = _loginRepository.GetOrCreateUserInfo(loginData);
                 return new LoginResultDto { Success = true, UserInfo = userInfo };
             }
             catch (Exception ex)
@@ -52,6 +49,5 @@ namespace OAuthExample.Web.Services
                 return new LoginResultDto { Error = "Error processing callback" };
             }
         }
-
     }
 }
