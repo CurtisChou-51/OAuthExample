@@ -9,7 +9,7 @@ namespace OAuthExample.Service
         AuthenticationMethodEnum AuthenticationMethod { get; }
 
         /// <summary> 取得登入頁面網址 </summary>
-        string GetLoginPageUrl();
+        string GetLoginPageUrl(string state);
 
         /// <summary> 登入 </summary>
         Task<LoginDataDto> Login(string code);
