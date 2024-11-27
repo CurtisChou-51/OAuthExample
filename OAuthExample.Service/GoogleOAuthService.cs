@@ -23,9 +23,9 @@ namespace OAuthExample.Service
 
         public AuthenticationMethodEnum AuthenticationMethod => AuthenticationMethodEnum.Google;
 
-        public string GetLoginPageUrl()
+        public string GetLoginPageUrl(string state)
         {
-            return $"{_options.EndPoint.Authorize}?scope=email profile&include_granted_scopes=true&response_type=code&state=xxxxxxxxxxxxxxxx&redirect_uri={_options.CallbackUrl}&client_id={_options.ClientId}";
+            return $"{_options.EndPoint.Authorize}?scope=email profile&include_granted_scopes=true&response_type=code&state={state}&redirect_uri={_options.CallbackUrl}&client_id={_options.ClientId}";
         }
 
         public async Task<LoginDataDto> Login(string code)

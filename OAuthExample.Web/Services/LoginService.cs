@@ -10,12 +10,14 @@ namespace OAuthExample.Web.Services
         private readonly ILogger _logger;
         private readonly IEnumerable<IOAuthService> _oAuthServices;
         private readonly ILoginRepository _loginRepository;
+        private readonly IStateManageService _stateManageService;
 
-        public LoginService(ILogger<LoginService> logger, IEnumerable<IOAuthService> oAuthService, ILoginRepository loginRepository)
+        public LoginService(ILogger<LoginService> logger, IEnumerable<IOAuthService> oAuthService, ILoginRepository loginRepository, IStateManageService stateManageService)
         {
             _logger = logger;
             _oAuthServices = oAuthService;
             _loginRepository = loginRepository;
+            _stateManageService = stateManageService;
         }
 
         /// <summary> 取得 OAuth 登入 Url </summary>
@@ -24,7 +26,8 @@ namespace OAuthExample.Web.Services
             var service = _oAuthServices.FirstOrDefault(x => x.AuthenticationMethod.ToString() == authenticationMethod);
             if (service == null)
                 return new OAuthLoginUrlDto { Error = "undefined authenticationMethod" };
-            string url = service.GetLoginPageUrl();
+            string state = _stateManageService.GenerateState();
+            string url = service.GetLoginPageUrl(state);
             return new OAuthLoginUrlDto { Success = true, Url = url };
         }
 
@@ -38,6 +41,9 @@ namespace OAuthExample.Web.Services
                 var oAuthService = _oAuthServices.FirstOrDefault(x => x.AuthenticationMethod.ToString() == authenticationMethod);
                 if (oAuthService == null)
                     return new LoginResultDto { Error = "undefined authenticationMethod" };
+
+                if (!_stateManageService.ValidateState(state))
+                    return new LoginResultDto { Error = "state is not valid" };
 
                 LoginDataDto loginData = await oAuthService.Login(code);
                 LoginUserInfoDto userInfo = _loginRepository.GetOrCreateUserInfo(loginData);
