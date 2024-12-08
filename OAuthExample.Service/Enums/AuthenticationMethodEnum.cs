@@ -3,6 +3,7 @@
     public enum AuthenticationMethodEnum
     {
         Google,
-        Line
+        Line,
+        Github
     }
 }
