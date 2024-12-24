@@ -4,6 +4,7 @@
     {
         Google,
         Line,
-        Github
+        Github,
+        Microsoft
     }
 }

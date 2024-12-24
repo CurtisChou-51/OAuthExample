@@ -19,12 +19,14 @@ namespace OAuthExample.Web
             builder.Services.AddScoped<IOAuthService, GoogleOAuthService>();
             builder.Services.AddScoped<IOAuthService, LineOAuthService>();
             builder.Services.AddScoped<IOAuthService, GithubOAuthService>();
+            builder.Services.AddScoped<IOAuthService, MicrosoftOAuthService>();
             builder.Services.AddScoped<ILoginService, LoginService>();
             builder.Services.AddScoped<ILoginRepository, LoginRepository>();
             builder.Services.AddScoped<IStateManageService, StateManageService>();
             builder.Services.Configure<GoogleLoginOptions>(configuration.GetSection("GoogleLogin"));
             builder.Services.Configure<LineLoginOptions>(configuration.GetSection("LineLogin"));
             builder.Services.Configure<GithubLoginOptions>(configuration.GetSection("GithubLogin"));
+            builder.Services.Configure<MicrosoftLoginOptions>(configuration.GetSection("MicrosoftLogin"));
             builder.Services.Configure<StateManageOptions>(configuration.GetSection("StateManage"));
 
             builder.Services.AddAuthentication("LoginAuth")

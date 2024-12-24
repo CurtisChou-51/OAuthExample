@@ -31,4 +31,12 @@
         public string ClientSecret { get; set; } = string.Empty;
         public string AppName { get; set; } = string.Empty;
     }
+
+    public class MicrosoftLoginOptions
+    {
+        public EndPointOptions EndPoint { get; set; } = new();
+        public string CallbackUrl { get; set; } = string.Empty;
+        public string ClientId { get; set; } = string.Empty;
+        public string ClientSecret { get; set; } = string.Empty;
+    }
 }
