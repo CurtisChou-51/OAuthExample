@@ -1,6 +1,6 @@
-﻿using OAuthExample.Web.Models;
+﻿using OAuthExample.Service.Models;
 
-namespace OAuthExample.Web.Services
+namespace OAuthExample.Service.Services
 {
     public interface ILoginService
     {

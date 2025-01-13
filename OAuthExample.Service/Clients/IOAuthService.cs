@@ -1,7 +1,7 @@
 ﻿using OAuthExample.Service.Enums;
 using OAuthExample.Service.Models;
 
-namespace OAuthExample.Service
+namespace OAuthExample.Service.Clients
 {
     public interface IOAuthService
     {
@@ -12,6 +12,6 @@ namespace OAuthExample.Service
         string GetLoginPageUrl(string state);
 
         /// <summary> 登入 </summary>
-        Task<LoginDataDto> Login(string code);
+        Task<LoginClientDataDto> Login(string code);
     }
 }

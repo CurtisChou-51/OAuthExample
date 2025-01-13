@@ -1,4 +1,4 @@
-﻿namespace OAuthExample.Web.Services
+﻿namespace OAuthExample.Service.Services
 {
     public interface IStateManageService
     {

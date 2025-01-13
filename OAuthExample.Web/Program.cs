@@ -1,8 +1,7 @@
-using OAuthExample.Service;
+using OAuthExample.Service.Clients;
 using OAuthExample.Service.Options;
-using OAuthExample.Web.Options;
-using OAuthExample.Web.Repositories;
-using OAuthExample.Web.Services;
+using OAuthExample.Service.Repositories;
+using OAuthExample.Service.Services;
 
 namespace OAuthExample.Web
 {

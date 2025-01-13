@@ -1,4 +1,4 @@
-﻿namespace OAuthExample.Web.Options
+﻿namespace OAuthExample.Service.Options
 {
     public class StateManageOptions
     {
