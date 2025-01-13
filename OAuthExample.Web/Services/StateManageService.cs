@@ -8,19 +8,21 @@ namespace OAuthExample.Web.Services
     public class StateManageService : IStateManageService
     {
         private readonly TimeSpan _validityDuration;
+        private readonly TimeProvider _timeProvider;
         private readonly string _encryptionKey;
 
-        public StateManageService(IOptions<StateManageOptions> options)
+        public StateManageService(IOptions<StateManageOptions> options, TimeProvider timeProvider)
         {
             _validityDuration = TimeSpan.FromMinutes(options.Value.ValidityMinutes);
             _encryptionKey = options.Value.EncryptionKey;
+            _timeProvider = timeProvider;
         }
 
         /// <summary> 產生一個 state 字串用於 OAuth 的 CSRF 驗證 </summary>
         public string GenerateState()
         {
             // 建立時間戳 > 加密 > state
-            string rawTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+            string rawTimestamp = _timeProvider.GetUtcNow().ToUnixTimeSeconds().ToString();
             return EncryptHelper.Encrypt(rawTimestamp, _encryptionKey);
         }
 
@@ -37,7 +39,7 @@ namespace OAuthExample.Web.Services
                     return false;
 
                 DateTimeOffset stateTime = DateTimeOffset.FromUnixTimeSeconds(timestamp);
-                return DateTimeOffset.UtcNow - stateTime <= _validityDuration;
+                return _timeProvider.GetUtcNow() - stateTime <= _validityDuration;
             }
             catch
             {
