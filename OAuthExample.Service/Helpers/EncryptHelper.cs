@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace OAuthExample.Web.Helpers
+namespace OAuthExample.Service.Helpers
 {
     public static class EncryptHelper
     {

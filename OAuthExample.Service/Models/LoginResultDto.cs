@@ -1,4 +1,4 @@
-﻿namespace OAuthExample.Web.Models
+﻿namespace OAuthExample.Service.Models
 {
     public class OAuthLoginUrlDto
     {

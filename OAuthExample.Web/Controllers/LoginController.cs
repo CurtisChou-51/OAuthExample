@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using OAuthExample.Web.Models;
-using OAuthExample.Web.Services;
+using OAuthExample.Service.Models;
+using OAuthExample.Service.Services;
 using System.Security.Claims;
 
 namespace OAuthExample.Web.Controllers

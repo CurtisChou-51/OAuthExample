@@ -1,9 +1,10 @@
-﻿using OAuthExample.Service;
+﻿using Microsoft.Extensions.Logging;
+using OAuthExample.Service.Clients;
+using OAuthExample.Service.Entities;
 using OAuthExample.Service.Models;
-using OAuthExample.Web.Models;
-using OAuthExample.Web.Repositories;
+using OAuthExample.Service.Repositories;
 
-namespace OAuthExample.Web.Services
+namespace OAuthExample.Service.Services
 {
     public class LoginService : ILoginService
     {
@@ -12,10 +13,10 @@ namespace OAuthExample.Web.Services
         private readonly ILoginRepository _loginRepository;
         private readonly IStateManageService _stateManageService;
 
-        public LoginService(ILogger<LoginService> logger, IEnumerable<IOAuthService> oAuthService, ILoginRepository loginRepository, IStateManageService stateManageService)
+        public LoginService(ILogger<LoginService> logger, IEnumerable<IOAuthService> oAuthServices, ILoginRepository loginRepository, IStateManageService stateManageService)
         {
             _logger = logger;
-            _oAuthServices = oAuthService;
+            _oAuthServices = oAuthServices;
             _loginRepository = loginRepository;
             _stateManageService = stateManageService;
         }
@@ -45,8 +46,8 @@ namespace OAuthExample.Web.Services
                 if (!_stateManageService.ValidateState(state))
                     return new LoginResultDto { Error = "state is not valid" };
 
-                LoginDataDto loginData = await oAuthService.Login(code);
-                LoginUserInfoDto userInfo = _loginRepository.GetOrCreateUserInfo(loginData);
+                LoginClientDataDto loginClientDataDto = await oAuthService.Login(code);
+                LoginUserInfoDto userInfo = GetOrCreateUserInfo(loginClientDataDto);
                 return new LoginResultDto { Success = true, UserInfo = userInfo };
             }
             catch (Exception ex)
@@ -55,5 +56,26 @@ namespace OAuthExample.Web.Services
                 return new LoginResultDto { Error = "Error processing callback" };
             }
         }
+
+        private LoginUserInfoDto GetOrCreateUserInfo(LoginClientDataDto loginClientDataDto)
+        {
+            UserLoginLinkEntity userLoginLinkEntity = new UserLoginLinkEntity
+            {
+                ClientId = loginClientDataDto.Id,
+                AuthenticationMethod = loginClientDataDto.AuthenticationMethod.ToString()
+            };
+            UserInfoEntity userInfoEntity = new UserInfoEntity
+            {
+                UserName = loginClientDataDto.Name
+            };
+
+            UserInfoEntity result = _loginRepository.GetOrCreateUserInfo(userLoginLinkEntity, userInfoEntity);
+            return new LoginUserInfoDto
+            {
+                UserId = result.UserId,
+                UserName = result.UserName
+            };
+        }
+
     }
 }

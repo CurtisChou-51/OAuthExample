@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
-using OAuthExample.Web.Helpers;
-using OAuthExample.Web.Options;
+using OAuthExample.Service.Helpers;
+using OAuthExample.Service.Options;
 
-namespace OAuthExample.Web.Services
+namespace OAuthExample.Service.Services
 {
     /// <summary> 此實作的 state 使用加解密來進行處理，也可以使用 session 或其他機制來管理 state </summary>
     public class StateManageService : IStateManageService

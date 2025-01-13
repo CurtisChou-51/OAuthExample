@@ -6,7 +6,7 @@ using OAuthExample.Service.Models;
 using OAuthExample.Service.Options;
 using System.Net.Http.Headers;
 
-namespace OAuthExample.Service
+namespace OAuthExample.Service.Clients
 {
     public class MicrosoftOAuthService : IOAuthService
     {
@@ -28,7 +28,7 @@ namespace OAuthExample.Service
             return $"{_options.EndPoint.Authorize}?scope=user.read+openid+profile+email&&state={state}&response_type=code&redirect_uri={_options.CallbackUrl}&client_id={_options.ClientId}";
         }
 
-        public async Task<LoginDataDto> Login(string code)
+        public async Task<LoginClientDataDto> Login(string code)
         {
             string tokenJsonStr = await GetToken(code);
             TokenDto tokenDto = JsonConvert.DeserializeObject<TokenDto>(tokenJsonStr) ?? new();
@@ -37,7 +37,7 @@ namespace OAuthExample.Service
             string displayName = userInfoDto.name;
             if (string.IsNullOrWhiteSpace(displayName))
                 displayName = $"{userInfoDto.givenname} {userInfoDto.familyname}";
-            return new LoginDataDto
+            return new LoginClientDataDto
             {
                 Id = userInfoDto.sub,
                 Name = displayName,

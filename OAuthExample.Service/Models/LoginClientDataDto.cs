@@ -2,7 +2,7 @@
 
 namespace OAuthExample.Service.Models
 {
-    public class LoginDataDto
+    public class LoginClientDataDto
     {
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
